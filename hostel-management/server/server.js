@@ -43,9 +43,14 @@ const connectDB = async () => {
 
 // Middlewares (AFTER app declaration)
 app.use(cors({
-  origin: ["http://localhost:5173", "https://hostel-ui.vercel.app"],
+  origin: [
+    "http://localhost:5173",
+    "https://hostel-ui.vercel.app",
+    "https://hms-opal.vercel.app" 
+  ],
   credentials: true
 }));
+
 app.use(express.json());
 
 // Route imports
