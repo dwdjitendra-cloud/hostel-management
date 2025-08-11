@@ -1,12 +1,6 @@
 // Load environment variables FIRST
 const dotenv = require('dotenv');
 const path = require('path');
-import cors from "cors";
-
-app.use(cors({
-  origin: ["http://localhost:5173", "https://hostel-ui.vercel.app"], // update later with Vercel URL
-  credentials: true
-}));
 
 // Configure dotenv with explicit path and debug
 dotenv.config({
@@ -21,9 +15,12 @@ console.log('PORT:', process.env.PORT || 'NOT FOUND');
 
 // Core dependencies
 const express = require('express');
-// const cors = require('cors');
+const cors = require('cors');  // Use require, not import
 const mongoose = require('mongoose');
 const errorHandler = require('./middlewares/error');
+
+// Initialize Express app FIRST
+const app = express();
 
 // Database connection
 const connectDB = async () => {
@@ -31,7 +28,6 @@ const connectDB = async () => {
     if (!process.env.MONGO_URI) {
       throw new Error('MongoDB URI not configured in .env file');
     }
-
     await mongoose.connect(process.env.MONGO_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
@@ -45,11 +41,11 @@ const connectDB = async () => {
   }
 };
 
-// Initialize Express app
-const app = express();
-
-// Middlewares
-app.use(cors());
+// Middlewares (AFTER app declaration)
+app.use(cors({
+  origin: ["http://localhost:5173", "https://hostel-ui.vercel.app"],
+  credentials: true
+}));
 app.use(express.json());
 
 // Route imports
@@ -77,6 +73,11 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// Root route for testing
+app.get('/', (req, res) => {
+  res.json({ message: 'Hostel Management API is running!' });
+});
+
 // Error Handling
 app.use(errorHandler);
 
@@ -84,27 +85,27 @@ app.use(errorHandler);
 const PORT = process.env.PORT || 5000;
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
-// Start Server
-const server = app.listen(PORT, () => {
-  console.log(`🚀 Server running in ${NODE_ENV} mode on port ${PORT}`);
-  console.log(`📡 MongoDB URI: ${process.env.MONGO_URI ? 'Configured' : 'Missing'}`);
-});
-
-// Handle shutdown gracefully
-process.on('SIGTERM', () => {
-  console.log('SIGTERM received. Shutting down gracefully...');
-  server.close(() => {
-    console.log('💤 Server terminated');
-    process.exit(0);
-  });
-});
-
-process.on('unhandledRejection', (err) => {
-  console.error('Unhandled Rejection:', err);
-  server.close(() => process.exit(1));
-});
-
-// Connect to database after server starts
+// Connect to database first, then start server
 connectDB().then(() => {
   console.log('🔗 Database connection established');
+  
+  // Start Server
+  const server = app.listen(PORT, () => {
+    console.log(`🚀 Server running in ${NODE_ENV} mode on port ${PORT}`);
+    console.log(`📡 MongoDB URI: ${process.env.MONGO_URI ? 'Configured' : 'Missing'}`);
+  });
+
+  // Handle shutdown gracefully
+  process.on('SIGTERM', () => {
+    console.log('SIGTERM received. Shutting down gracefully...');
+    server.close(() => {
+      console.log('💤 Server terminated');
+      process.exit(0);
+    });
+  });
+
+  process.on('unhandledRejection', (err) => {
+    console.error('Unhandled Rejection:', err);
+    server.close(() => process.exit(1));
+  });
 });
