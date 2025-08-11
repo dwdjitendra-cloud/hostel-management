@@ -2,6 +2,7 @@
   "name": "hostel-management-server",
   "version": "1.0.0",
   "description": "Hostel Management System Backend",
+  "type": "commonjs",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
