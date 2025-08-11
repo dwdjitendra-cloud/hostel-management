@@ -21,7 +21,7 @@ console.log('PORT:', process.env.PORT || 'NOT FOUND');
 
 // Core dependencies
 const express = require('express');
-const cors = require('cors');
+// const cors = require('cors');
 const mongoose = require('mongoose');
 const errorHandler = require('./middlewares/error');
 
