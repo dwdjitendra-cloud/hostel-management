@@ -46,7 +46,8 @@ app.use(cors({
   origin: [
     "http://localhost:5173",
     "https://hostel-ui.vercel.app",
-    "https://hms-opal.vercel.app" 
+    "https://hms-opal.vercel.app",
+    "https://hostel-management-client.onrender.com"
   ],
   credentials: true
 }));
