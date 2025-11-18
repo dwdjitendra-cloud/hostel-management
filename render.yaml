@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: hostel-management-api
+    env: node
+    rootDir: server
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeploy: true
+
+  - type: static_site
+    name: hostel-management-client
+    rootDir: client
+    buildCommand: npm ci && npm run build
+    publishPath: dist
+    headers:
+      - path: /*
+        name: Access-Control-Allow-Origin
+        value: "*"
+    envVars:
+      - key: VITE_API_BASE_URL
+        value: https://hostel-management-client.onrender.com
